@@ -9,27 +9,28 @@ test_install.py
 test_skill_copy.py
 
 # 安装和启动脚本
-md_installer.py
 start_evolution_system.py
-start_skill.bat
 
-# 自动化工具目录
+# 自动化工具目录（保留核心文件）
 automation/
+!.trae/skills/AI-Agent-Core-Skill/automation/
 
-# 知识库目录
+# 知识库目录（保留核心文件）
 knowledge_base/
+!.trae/skills/AI-Agent-Core-Skill/knowledge_base/
 
 # 知识更新器
 knowledge-updater/
 
-# 技能目录
+# 技能目录（保留核心文件）
 skills/
+!.trae/skills/
 
 # 任务目录
 任务目录/
 
-# .trae目录（除了技能配置）
-.trae/
+# .trae目录（保留技能配置和核心文件）
+!.trae/skills/
 !.trae/skill-config.json
 
 # 标准工作流程.MD（不要推送）
