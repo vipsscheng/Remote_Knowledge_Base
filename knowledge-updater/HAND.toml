@@ -1,0 +1,24 @@
+name = "knowledge-updater"
+description = "知识库自动更新和同步 hand"
+version = "1.0.0"
+author = "AI Agent Core Skill"
+
+[triggers]
+interval = "5m"  # 每5分钟检查一次
+on_change = true  # 有变更时触发
+
+[tools]
+enabled = ["git", "file_system", "http"]
+
+[config]
+remote_repo = "https://github.com/vipsscheng/Remote_Knowledge_Base"
+local_repo = ".trae/skills/AI-Agent-Core-Skill"
+sync_interval = "5m"
+auto_increment_version = true
+
+[metrics]
+enabled = ["sync_status", "version_status", "conflict_count"]
+
+[guardrails]
+enabled = true
+require_approval = false
