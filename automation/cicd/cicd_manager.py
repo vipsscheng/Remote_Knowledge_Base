@@ -25,6 +25,7 @@ class CICDManager:
         print("Detecting CLI tools...")
         
         tools = {
+            # 国际工具
             'code': {'name': 'Visual Studio Code', 'command': 'code', 'type': 'ide'},
             'git': {'name': 'Git', 'command': 'git', 'type': 'version_control'},
             'python': {'name': 'Python', 'command': 'python', 'type': 'interpreter'},
@@ -42,7 +43,17 @@ class CICDManager:
             'helm': {'name': 'Helm', 'command': 'helm', 'type': 'deployment'},
             'kubectl': {'name': 'kubectl', 'command': 'kubectl', 'type': 'deployment'},
             'ansible': {'name': 'Ansible', 'command': 'ansible', 'type': 'deployment'},
-            'terraform': {'name': 'Terraform', 'command': 'terraform', 'type': 'infrastructure'}
+            'terraform': {'name': 'Terraform', 'command': 'terraform', 'type': 'infrastructure'},
+            # 国内工具
+            'cnpm': {'name': 'cnpm', 'command': 'cnpm', 'type': 'package_manager'},
+            'yarncn': {'name': 'Yarn China', 'command': 'yarncn', 'type': 'package_manager'},
+            'tencentcloud': {'name': 'Tencent Cloud CLI', 'command': 'tencentcloud', 'type': 'cloud'},
+            'aliyun': {'name': 'Alibaba Cloud CLI', 'command': 'aliyun', 'type': 'cloud'},
+            'huaweicloud': {'name': 'Huawei Cloud CLI', 'command': 'huaweicloud', 'type': 'cloud'},
+            'wenxin-cli': {'name': '文心一言 CLI', 'command': 'wenxin-cli', 'type': 'ai'},
+            'xinghuo-cli': {'name': '讯飞星火 CLI', 'command': 'xinghuo-cli', 'type': 'ai'},
+            'qwen-cli': {'name': '通义千问 CLI', 'command': 'qwen-cli', 'type': 'ai'},
+            'doubao-cli': {'name': '豆包 CLI', 'command': 'doubao-cli', 'type': 'ai'}
         }
         
         detected_tools = []

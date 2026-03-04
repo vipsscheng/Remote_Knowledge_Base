@@ -32,10 +32,16 @@ class ModelMonitor:
             },
             'monitoring_interval': 3600,  # 1 hour
             'models_to_monitor': [
+                # 国际模型
                 'gpt-4',
                 'gpt-3.5-turbo',
                 'claude-3',
-                'gemini-pro'
+                'gemini-pro',
+                # 国内模型
+                'wenxin',
+                'xinghuo',
+                'qwen',
+                'doubao'
             ],
             'adaptation_strategies': {
                 'default': 'standard_strategy.json'
@@ -88,6 +94,30 @@ class ModelMonitor:
                 },
                 "gemini-pro": {
                     "max_tokens": 32768,
+                    "temperature": 0.7,
+                    "top_p": 0.95,
+                    "timeout": 60
+                },
+                "wenxin": {
+                    "max_tokens": 8192,
+                    "temperature": 0.7,
+                    "top_p": 0.95,
+                    "timeout": 60
+                },
+                "xinghuo": {
+                    "max_tokens": 8192,
+                    "temperature": 0.7,
+                    "top_p": 0.95,
+                    "timeout": 60
+                },
+                "qwen": {
+                    "max_tokens": 8192,
+                    "temperature": 0.7,
+                    "top_p": 0.95,
+                    "timeout": 60
+                },
+                "doubao": {
+                    "max_tokens": 8192,
                     "temperature": 0.7,
                     "top_p": 0.95,
                     "timeout": 60

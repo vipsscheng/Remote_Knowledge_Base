@@ -17,10 +17,106 @@ class MDInstaller:
         self.md_file = md_file
         self.base_dir = os.path.dirname(md_file)
         self.timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        
+        # 检测Trae版本（国际版或国内版）
+        self.trae_version = self._detect_trae_version()
+        print(f"Detected Trae version: {self.trae_version}")
+        
+        # 根据Trae版本设置不同的技能文件夹路径
         self.skill_folder = os.path.join(os.path.expanduser('~'), '技能文件夹')
         self.knowledge_base = os.path.join(self.skill_folder, '知识库')
         self.automation_tools = os.path.join(self.skill_folder, '自动化工具')
         self.evolution_dir = os.path.join(self.automation_tools, 'evolution')
+        
+        # 确保技能目录在两个版本中都能被找到
+        self._ensure_skill_directories()
+    
+    def _detect_trae_version(self):
+        """检测Trae版本（国际版或国内版）"""
+        # 检查环境变量
+        if 'TRAE_CN' in os.environ or 'TRAE_VERSION' in os.environ and 'CN' in os.environ['TRAE_VERSION']:
+            return 'CN'
+        
+        # 检查常见的Trae安装路径
+        common_paths = [
+            os.path.join(os.path.expanduser('~'), '.trae'),
+            os.path.join(os.path.expanduser('~'), '.trae-cn'),
+            os.path.join(os.environ.get('APPDATA', ''), 'Trae'),
+            os.path.join(os.environ.get('APPDATA', ''), 'Trae CN')
+        ]
+        
+        for path in common_paths:
+            if os.path.exists(path):
+                if 'cn' in path.lower() or 'cn' in os.path.basename(path).lower():
+                    return 'CN'
+                else:
+                    return 'International'
+        
+        # 检查当前进程信息
+        try:
+            import psutil
+            for proc in psutil.process_iter(['name']):
+                try:
+                    name = proc.info['name'].lower()
+                    if 'trae' in name:
+                        if 'cn' in name:
+                            return 'CN'
+                        else:
+                            return 'International'
+                except:
+                    pass
+        except:
+            pass
+        
+        # 默认返回国际版
+        return 'International'
+    
+    def _ensure_skill_directories(self):
+        """确保技能目录在两个版本中都能被找到"""
+        # 为国际版创建技能目录
+        trae_dir = os.path.join(os.path.expanduser('~'), '.trae')
+        skills_dir = os.path.join(trae_dir, 'skills')
+        if not os.path.exists(skills_dir):
+            try:
+                os.makedirs(skills_dir)
+                print(f"Created Trae International skills directory: {skills_dir}")
+            except:
+                pass
+        
+        # 为国内版创建技能目录
+        trae_cn_dir = os.path.join(os.path.expanduser('~'), '.trae-cn')
+        skills_cn_dir = os.path.join(trae_cn_dir, 'skills')
+        if not os.path.exists(skills_cn_dir):
+            try:
+                os.makedirs(skills_cn_dir)
+                print(f"Created Trae CN skills directory: {skills_cn_dir}")
+            except:
+                pass
+        
+        # 复制技能到两个版本的目录中
+        self._copy_skill_to_directories([skills_dir, skills_cn_dir])
+    
+    def _copy_skill_to_directories(self, directories):
+        """将技能复制到指定目录"""
+        skill_name = 'AI-Agent-Core-Skill'
+        skill_source = os.path.join(self.base_dir, '.trae', 'skills', skill_name)
+        
+        print(f"Skill source path: {skill_source}")
+        print(f"Skill source exists: {os.path.exists(skill_source)}")
+        
+        if os.path.exists(skill_source):
+            for directory in directories:
+                skill_target = os.path.join(directory, skill_name)
+                print(f"Copying to: {skill_target}")
+                print(f"Target exists: {os.path.exists(skill_target)}")
+                if not os.path.exists(skill_target):
+                    try:
+                        shutil.copytree(skill_source, skill_target)
+                        print(f"Copied skill to: {skill_target}")
+                    except Exception as e:
+                        print(f"Error copying skill: {e}")
+        else:
+            print(f"Skill source not found: {skill_source}")
     
     def parse_md_file(self):
         """解析MD文件中的安装指令"""
@@ -664,58 +760,93 @@ if __name__ == "__main__":
     
     def install(self):
         """执行安装过程"""
-        print("Starting installation from MD file...")
-        print("=" * 60)
-        
-        # 解析MD文件
-        config = self.parse_md_file()
-        if not config:
+        try:
+            print("Starting installation from MD file...")
+            print("=" * 60)
+            
+            # 打印当前环境信息
+            print(f"Current directory: {os.getcwd()}")
+            print(f"Skill folder: {self.skill_folder}")
+            print(f"Python version: {sys.version}")
+            
+            # 解析MD文件
+            print("\nStep 1: Parsing MD file...")
+            config = self.parse_md_file()
+            if not config:
+                print("Error: Failed to parse MD file")
+                return False
+            
+            # 创建目录
+            print("\nStep 2: Creating directories...")
+            self.create_directories()
+            
+            # 生成文件
+            print("\nStep 3: Generating files...")
+            if config.get('auto_generate', True):
+                files_to_generate = config.get('generate_files', [])
+                for file in files_to_generate:
+                    if 'start_skill.bat' in file:
+                        self.generate_start_script()
+                    elif 'system_config.json' in file:
+                        self.generate_evolution_config()
+                    elif 'self_evolution.py' in file:
+                        self.copy_self_evolution()
+            
+            # 生成配置文件
+            print("\nStep 4: Generating config file...")
+            config_file = os.path.join(self.skill_folder, 'config.json')
+            skill_config = {
+                'skill_name': config.get('skill_name', 'AI Agent Core Skill'),
+                'version': config.get('version', '1.0.0'),
+                'install_date': self.timestamp,
+                'skill_folder': self.skill_folder,
+                'knowledge_base': self.knowledge_base,
+                'automation_tools': self.automation_tools,
+                'evolution_dir': self.evolution_dir
+            }
+            
+            with open(config_file, 'w', encoding='utf-8') as f:
+                json.dump(skill_config, f, indent=2, ensure_ascii=False)
+            
+            print(f"Generated skill config: {config_file}")
+            
+            # 验证安装结果
+            print("\nStep 5: Verifying installation...")
+            if os.path.exists(self.skill_folder):
+                print(f"✓ Skill folder created: {self.skill_folder}")
+            else:
+                print(f"✗ Skill folder not created: {self.skill_folder}")
+                return False
+            
+            start_script = os.path.join(self.skill_folder, 'start_skill.bat')
+            if os.path.exists(start_script):
+                print(f"✓ Start script created: {start_script}")
+            else:
+                print(f"✗ Start script not created: {start_script}")
+            
+            config_file = os.path.join(self.skill_folder, 'config.json')
+            if os.path.exists(config_file):
+                print(f"✓ Config file created: {config_file}")
+            else:
+                print(f"✗ Config file not created: {config_file}")
+            
+            # 启动技能
+            print("\nStep 6: Starting skill...")
+            if os.path.exists(start_script):
+                print(f"Skill can be started with: {start_script}")
+            
+            print("=" * 60)
+            print("Installation completed successfully!")
+            print(f"Skill folder: {self.skill_folder}")
+            print(f"Knowledge base: {self.knowledge_base}")
+            print(f"Automation tools: {self.automation_tools}")
+            
+            return True
+        except Exception as e:
+            print(f"Error during installation: {e}")
+            import traceback
+            traceback.print_exc()
             return False
-        
-        # 创建目录
-        self.create_directories()
-        
-        # 生成文件
-        if config.get('auto_generate', True):
-            files_to_generate = config.get('generate_files', [])
-            for file in files_to_generate:
-                if 'start_skill.bat' in file:
-                    self.generate_start_script()
-                elif 'system_config.json' in file:
-                    self.generate_evolution_config()
-                elif 'self_evolution.py' in file:
-                    self.copy_self_evolution()
-        
-        # 生成配置文件
-        config_file = os.path.join(self.skill_folder, 'config.json')
-        skill_config = {
-            'skill_name': config.get('skill_name', 'AI Agent Core Skill'),
-            'version': config.get('version', '1.0.0'),
-            'install_date': self.timestamp,
-            'skill_folder': self.skill_folder,
-            'knowledge_base': self.knowledge_base,
-            'automation_tools': self.automation_tools,
-            'evolution_dir': self.evolution_dir
-        }
-        
-        with open(config_file, 'w', encoding='utf-8') as f:
-            json.dump(skill_config, f, indent=2, ensure_ascii=False)
-        
-        print(f"Generated skill config: {config_file}")
-        
-        # 启动技能
-        print("\nStarting skill...")
-        start_script = os.path.join(self.skill_folder, 'start_skill.bat')
-        if os.path.exists(start_script):
-            print(f"Skill can be started with: {start_script}")
-        
-        print("=" * 60)
-        print("Installation completed successfully!")
-        print(f"Skill folder: {self.skill_folder}")
-        print(f"Knowledge base: {self.knowledge_base}")
-        print(f"Automation tools: {self.automation_tools}")
-        
-        return True
 
 def main():
     md_file = os.path.join(os.path.dirname(__file__), '标准工作流程.MD')

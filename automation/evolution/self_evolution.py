@@ -19,8 +19,9 @@ from datetime import datetime
 class SelfEvolutionSystem:
     def __init__(self):
         self.timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        self.base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self.evolution_dir = os.path.join(self.base_dir, 'automation', 'evolution')
+        # 使用用户目录作为基础目录，确保全局生效
+        self.base_dir = os.path.join(os.path.expanduser('~'), '技能文件夹')
+        self.evolution_dir = os.path.join(self.base_dir, '自动化工具', 'evolution')
         self.log_dir = os.path.join(self.evolution_dir, 'logs')
         self.model_config = os.path.join(self.evolution_dir, 'model_config.json')
         self.system_config = os.path.join(self.evolution_dir, 'system_config.json')
@@ -79,10 +80,16 @@ class SelfEvolutionSystem:
     def _detect_ai_models(self):
         """检测可用的AI模型"""
         models = {
+            # 国际模型
             'gpt4': {'name': 'GPT-4', 'available': False, 'api_key': None},
             'claude': {'name': 'Claude', 'available': False, 'api_key': None},
             'gemini': {'name': 'Gemini', 'available': False, 'api_key': None},
-            'llama': {'name': 'Llama', 'available': False, 'api_key': None}
+            'llama': {'name': 'Llama', 'available': False, 'api_key': None},
+            # 国内模型
+            'wenxin': {'name': '文心一言', 'available': False, 'api_key': None},
+            'xinghuo': {'name': '讯飞星火', 'available': False, 'api_key': None},
+            'qwen': {'name': '通义千问', 'available': False, 'api_key': None},
+            'doubao': {'name': '豆包', 'available': False, 'api_key': None}
         }
         
         # 检查环境变量中的API密钥
@@ -102,6 +109,20 @@ class SelfEvolutionSystem:
                     self._log("Detected Llama model via Ollama")
             except:
                 pass
+        
+        # 检查国内模型的CLI工具
+        if self._is_tool_available('wenxin-cli'):
+            models['wenxin']['available'] = True
+            self._log("Detected 文心一言 model via CLI")
+        if self._is_tool_available('xinghuo-cli'):
+            models['xinghuo']['available'] = True
+            self._log("Detected 讯飞星火 model via CLI")
+        if self._is_tool_available('qwen-cli'):
+            models['qwen']['available'] = True
+            self._log("Detected 通义千问 model via CLI")
+        if self._is_tool_available('doubao-cli'):
+            models['doubao']['available'] = True
+            self._log("Detected 豆包 model via CLI")
         
         # 保存模型配置
         with open(self.model_config, 'w', encoding='utf-8') as f:
