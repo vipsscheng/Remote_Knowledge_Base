@@ -1,0 +1,14 @@
+{
+  "name": "AI Agent Core Skill",
+  "version": "1.0.0",
+  "description": "AI代理核心技能，支持自我进化、自动化工具和知识库管理",
+  "author": "Trae AI",
+  "tags": ["AI", "automation", "self-evolution", "knowledge-base"],
+  "main": "md_installer.py",
+  "dependencies": [],
+  "config": {
+    "skill_folder": "${HOME}/技能文件夹",
+    "knowledge_base": "${HOME}/技能文件夹/知识库",
+    "automation_tools": "${HOME}/技能文件夹/自动化工具"
+  }
+}
