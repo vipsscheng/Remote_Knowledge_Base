@@ -1,27 +1,59 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
+# 不需要的文件和目录
 
-# Windows
-Thumbs.db
-Desktop.ini
+# 测试和辅助脚本
+check_skill.ps1
+check_skill.py
+copy_skill.ps1
+copy_skill_simple.ps1
+test_install.py
+test_skill_copy.py
 
-# IDE
+# 安装和启动脚本
+md_installer.py
+start_evolution_system.py
+start_skill.bat
+
+# 自动化工具目录
+automation/
+
+# 知识库目录
+knowledge_base/
+
+# 知识更新器
+knowledge-updater/
+
+# 技能目录
+skills/
+
+# 任务目录
+任务目录/
+
+# .trae目录（除了技能配置）
+.trae/
+!.trae/skill-config.json
+
+# 标准工作流程.MD（不要推送）
+标准工作流程.MD
+
+# 其他文件
+TODO.md
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# IDE文件
 .vscode/
 .idea/
 
-# Logs
-logs/
-*.log
+# 编译产物
+__pycache__/
+*.pyc
 
-# Environment
-.env
-
-# Build artifacts
-build/
-dist/
-*.egg-info/
-
-# Local files
-技能文件夹/
+# 打包文件
+*.zip
+*.tar.gz
+*.tar.bz2
